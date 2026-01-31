@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CSS Anvil RPG</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,17 +10,20 @@
     <div id="start-screen" class="full-overlay">
         <div class="login-box">
             <h1>⚔️ 모루의 전설</h1>
-            <p>CSS로 그려진 세계</p>
+            <p>v2.0 Walking Update</p>
             <input type="text" id="nickname-input" placeholder="용사 이름">
-            <button id="start-game-btn">모험 시작</button>
+            <button id="start-game-btn" class="main-btn">모험 시작</button>
         </div>
     </div>
 
-    <div class="game-container">
+    <div id="game-app" class="game-container hidden">
         <header class="top-bar">
             <div class="resources">
                 <span class="currency">🔨 <span id="hammer-cnt">0</span></span>
                 <span class="currency">💰 <span id="gold-cnt">0</span></span>
+            </div>
+            <div class="stage-badge">
+                STAGE <span id="stage-num">1-1</span>
             </div>
             <div class="settings">
                 <button id="reset-data-btn" class="small-btn">초기화</button>
@@ -28,13 +31,9 @@
         </header>
 
         <section class="battle-stage">
-            <div class="stage-header">
-                STAGE <span id="stage-num">1-1</span>
-                <span id="boss-badge" class="hidden">☠️BOSS</span>
-            </div>
-            
             <div class="battle-field">
-                <div class="character-container">
+                <div id="hero-wrapper" class="unit-wrapper hero-start-pos">
+                    <div class="mini-hp-bar"><div class="fill" id="hero-hp-fill"></div></div>
                     <div id="hero-art" class="css-hero">
                         <div class="hero-body"></div>
                         <div class="hero-head"></div>
@@ -42,24 +41,17 @@
                     </div>
                 </div>
 
-                <div class="effect-area">
-                    <div id="damage-text" class="dmg-text"></div>
-                </div>
+                <div id="damage-layer"></div>
 
-                <div class="monster-container">
+                <div id="enemy-wrapper" class="unit-wrapper enemy-start-pos">
+                    <div class="mini-hp-bar"><div class="fill" id="enemy-hp-fill"></div></div>
                     <div id="enemy-art" class="css-monster slime">
                         <div class="mon-body"></div>
                         <div class="mon-eye left"></div>
                         <div class="mon-eye right"></div>
+                        <div id="boss-tag" class="hidden">BOSS</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="hp-bars">
-                <div class="bar-label">HERO <span id="hero-hp-text"></span></div>
-                <div class="bar-container"><div class="bar" id="player-hp-bar"></div></div>
-                <div class="bar-label" style="text-align:right;">ENEMY <span id="enemy-hp-text"></span></div>
-                <div class="bar-container"><div class="bar" id="enemy-hp-bar"></div></div>
             </div>
         </section>
 
@@ -69,14 +61,14 @@
 
         <section class="controls">
             <div class="anvil-info">
-                <span>모루 Lv.<span id="anvil-lv">1</span></span>
-                <span class="upgrade-cost">비용: 💰<span id="upgrade-cost">100</span></span>
+                <div class="anvil-lv-box">모루 Lv.<span id="anvil-lv">1</span></div>
+                <div class="cost-text">강화비용: 💰<span id="upgrade-cost">100</span></div>
             </div>
             <div class="actions">
-                <button id="upgrade-btn" class="sub-btn">모루 강화</button>
-                <button id="summon-btn" class="main-btn">
-                    <div class="hammer-icon">🔨</div>
-                    <div>제작 (10)</div>
+                <button id="upgrade-btn" class="sub-btn">강화</button>
+                <button id="summon-btn" class="main-btn big-summon">
+                    <span class="icon">🔨</span>
+                    <span>제작 (10)</span>
                 </button>
             </div>
         </section>
@@ -89,12 +81,12 @@
                 <div class="card" id="current-gear-card">
                     <div class="card-title">착용 중</div>
                     <div id="current-gear-detail" class="gear-view"></div>
-                    <button id="keep-btn">버리기 (+💰50)</button>
+                    <button id="keep-btn" class="sub-btn full-width">판매 (+💰50)</button>
                 </div>
                 <div class="card" id="new-gear-card">
                     <div class="card-title">신규 장비</div>
                     <div id="new-gear-detail" class="gear-view"></div>
-                    <button id="equip-btn">장착 하기</button>
+                    <button id="equip-btn" class="main-btn full-width">장착 하기</button>
                 </div>
             </div>
         </div>
@@ -103,7 +95,7 @@
     <div id="detail-modal" class="modal hidden">
         <div class="modal-content small-modal">
             <div id="selected-gear-detail" class="gear-view box-style"></div>
-            <button id="close-detail-btn" style="margin-top:10px;">닫기</button>
+            <button id="close-detail-btn" class="sub-btn" style="margin-top:10px;">닫기</button>
         </div>
     </div>
 
