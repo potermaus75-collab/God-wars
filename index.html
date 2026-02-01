@@ -3,56 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CSS Anvil RPG</title>
+    <title>Anvil RPG Mobile</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="start-screen" class="full-overlay">
         <div class="login-box">
-            <h1>⚔️ 모루의 전설</h1>
-            <p>v2.0 Walking Update</p>
-            <input type="text" id="nickname-input" placeholder="용사 이름">
+            <h1>⚔️ 영웅의 대장간</h1>
+            <p>384x698 Optimized</p>
+            <input type="text" id="nickname-input" placeholder="닉네임 입력">
             <button id="start-game-btn" class="main-btn">모험 시작</button>
         </div>
     </div>
 
     <div id="game-app" class="game-container hidden">
         <header class="top-bar">
-            <div class="resources">
-                <span class="currency">🔨 <span id="hammer-cnt">0</span></span>
-                <span class="currency">💰 <span id="gold-cnt">0</span></span>
+            <div class="currency-group">
+                <div class="res-item">🔨 <span id="hammer-cnt">0</span></div>
+                <div class="res-item">💰 <span id="gold-cnt">0</span></div>
             </div>
-            <div class="stage-badge">
-                STAGE <span id="stage-num">1-1</span>
-            </div>
-            <div class="settings">
-                <button id="reset-data-btn" class="small-btn">초기화</button>
-            </div>
+            <div class="stage-badge">STAGE <span id="stage-num">1-1</span></div>
+            <button id="reset-data-btn" class="mini-btn">⚙️</button>
         </header>
 
         <section class="battle-stage">
             <div class="battle-field">
-                <div id="hero-wrapper" class="unit-wrapper hero-start-pos">
-                    <div class="mini-hp-bar"><div class="fill" id="hero-hp-fill"></div></div>
-                    <div id="hero-art" class="css-hero">
-                        <div class="hero-body"></div>
-                        <div class="hero-head"></div>
-                        <div id="hero-weapon" class="weapon-hand sword"></div>
+                <div id="hero-wrapper" class="unit-wrapper hero-pos">
+                    <div class="hp-bar-box"><div class="hp-fill" id="hero-hp-fill"></div></div>
+                    <div id="hero-art" class="hq-hero">
+                        <div class="cape"></div>
+                        <div class="body"></div>
+                        <div class="head">
+                            <div class="helmet-visor"></div>
+                        </div>
+                        <div class="arm left"></div>
+                        <div class="arm right">
+                            <div id="hero-weapon" class="weapon sword"></div>
+                        </div>
+                        <div class="leg left"></div>
+                        <div class="leg right"></div>
                     </div>
                 </div>
 
                 <div id="damage-layer"></div>
 
-                <div id="enemy-wrapper" class="unit-wrapper enemy-start-pos">
-                    <div class="mini-hp-bar"><div class="fill" id="enemy-hp-fill"></div></div>
-                    <div id="enemy-art" class="css-monster slime">
-                        <div class="mon-body"></div>
+                <div id="enemy-wrapper" class="unit-wrapper enemy-pos">
+                    <div class="hp-bar-box"><div class="hp-fill" id="enemy-hp-fill"></div></div>
+                    <div id="enemy-art" class="hq-monster slime">
+                        <div class="mon-core"></div>
                         <div class="mon-eye left"></div>
                         <div class="mon-eye right"></div>
-                        <div id="boss-tag" class="hidden">BOSS</div>
+                        <div class="mon-mouth"></div>
+                        <div id="boss-badge" class="hidden">BOSS</div>
                     </div>
                 </div>
             </div>
+        </section>
+
+        <section class="skill-bar">
+            <div class="skill-slot" id="skill-1" onclick="useSkill(1)">
+                <div class="skill-icon">⚡</div>
+                <div class="skill-cooldown" id="cd-1"></div>
+            </div>
+            <div class="skill-slot" id="skill-2" onclick="useSkill(2)">
+                <div class="skill-icon">❤️</div>
+                <div class="skill-cooldown" id="cd-2"></div>
+            </div>
+            <div class="skill-info-text">스킬 (쿨타임 감소 적용)</div>
         </section>
 
         <section class="equipment-grid">
@@ -60,33 +77,30 @@
         </section>
 
         <section class="controls">
-            <div class="anvil-info">
-                <div class="anvil-lv-box">모루 Lv.<span id="anvil-lv">1</span></div>
-                <div class="cost-text">강화비용: 💰<span id="upgrade-cost">100</span></div>
+            <div class="anvil-status">
+                <div class="lv-txt">Lv.<span id="anvil-lv">1</span></div>
+                <button id="upgrade-btn" class="up-btn">강화 (💰<span id="upgrade-cost">100</span>)</button>
             </div>
-            <div class="actions">
-                <button id="upgrade-btn" class="sub-btn">강화</button>
-                <button id="summon-btn" class="main-btn big-summon">
-                    <span class="icon">🔨</span>
-                    <span>제작 (10)</span>
-                </button>
-            </div>
+            <button id="summon-btn" class="summon-btn">
+                <div class="hammer-ani">🔨</div>
+                <div>제작 (🔨10)</div>
+            </button>
         </section>
     </div>
 
     <div id="compare-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>제작 완료!</h3>
+            <h3 class="modal-header">장비 제작 완료!</h3>
             <div class="compare-box">
-                <div class="card" id="current-gear-card">
-                    <div class="card-title">착용 중</div>
-                    <div id="current-gear-detail" class="gear-view"></div>
-                    <button id="keep-btn" class="sub-btn full-width">판매 (+💰50)</button>
+                <div class="card bg-old">
+                    <div class="card-label">현재 장비</div>
+                    <div id="current-gear-detail" class="gear-desc"></div>
+                    <button id="keep-btn" class="btn-sell">판매 (+💰50)</button>
                 </div>
-                <div class="card" id="new-gear-card">
-                    <div class="card-title">신규 장비</div>
-                    <div id="new-gear-detail" class="gear-view"></div>
-                    <button id="equip-btn" class="main-btn full-width">장착 하기</button>
+                <div class="card bg-new">
+                    <div class="card-label">새 장비</div>
+                    <div id="new-gear-detail" class="gear-desc"></div>
+                    <button id="equip-btn" class="btn-equip">장착</button>
                 </div>
             </div>
         </div>
@@ -94,8 +108,8 @@
 
     <div id="detail-modal" class="modal hidden">
         <div class="modal-content small-modal">
-            <div id="selected-gear-detail" class="gear-view box-style"></div>
-            <button id="close-detail-btn" class="sub-btn" style="margin-top:10px;">닫기</button>
+            <div id="selected-gear-detail" class="gear-desc full-desc"></div>
+            <button id="close-detail-btn" class="btn-close">닫기</button>
         </div>
     </div>
 
