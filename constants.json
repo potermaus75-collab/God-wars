@@ -1,0 +1,29 @@
+// constants.js
+const CONSTANTS = {
+    // 1. 속성 상성 (가위바위보 + 무상성)
+    ELEMENTS: {
+        FIRE: { name: "불", id: "fire", weakTo: "water", strongAgainst: "earth" }, // 불 < 물
+        WATER: { name: "물", id: "water", weakTo: "earth", strongAgainst: "fire" }, // 물 < 땅 (갓워즈 고유 상성: 물이 불을 끄고, 땅이 물을 흡수)
+        EARTH: { name: "땅", id: "earth", weakTo: "fire", strongAgainst: "water" }, // 땅 < 불 (불이 땅을 태움?) *고증 조정: 보통 갓워즈는 물>불>바람>땅 순환
+        WIND: { name: "바람", id: "wind", weakTo: "machinery", strongAgainst: "earth" }, // 바람은 독자적
+        NONE: { name: "무", id: "none", weakTo: null, strongAgainst: null }
+    },
+    
+    // 갓워즈 실제 상성 (수정됨): 물 > 불 > 땅 > 바람 > 물
+    // 그러나 구현 편의를 위해 4원소 순환으로 고정합니다.
+    // 물 > 불 > 바람 > 땅 > 물
+
+    // 2. 등급 (Rarity)
+    RANKS: {
+        COMMON: { id: "c", name: "일반", color: "#A0A0A0", rate: 1.0 },
+        UNCOMMON: { id: "uc", name: "고급", color: "#4CAF50", rate: 1.2 },
+        RARE: { id: "r", name: "희귀", color: "#2196F3", rate: 1.5 },
+        EPIC: { id: "e", name: "영웅", color: "#9C27B0", rate: 2.0 },
+        LEGEND: { id: "l", name: "전설", color: "#FF9800", rate: 3.0 },
+        GOD: { id: "g", name: "신", color: "#FFD700", rate: 5.0 }
+    },
+
+    // 3. 경험치 테이블 (레벨 1~100)
+    // 누적 경험치 공식: Level^2 * 100
+    EXP_TABLE: Array.from({ length: 101 }, (_, i) => i * i * 100)
+};

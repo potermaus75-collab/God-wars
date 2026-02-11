@@ -1,0 +1,250 @@
+// data_bosses.js
+const BOSSES = {
+    // ============================================================
+    // [소형 보스] - Small Bosses (초반 파밍 / 친구 도움 불필요 수준)
+    // ============================================================
+    "boss_s_01": {
+        name: "광폭한 멧돼지", // 에리만토스의 멧돼지
+        rank: "small",
+        hp_max: 3000,
+        atk: 80,
+        def: 20,
+        req_stamina: 3,
+        time_limit: 1800,
+        rew_exp: 300,
+        rew_gold: 500,
+        drop_card: "g_gr_c1"
+    },
+    "boss_s_02": {
+        name: "하피 퀸",
+        rank: "small",
+        hp_max: 4500,
+        atk: 120,
+        def: 10,
+        req_stamina: 4,
+        time_limit: 1800,
+        rew_exp: 450,
+        rew_gold: 800,
+        drop_card: "g_gr_c2"
+    },
+    "boss_s_03": {
+        name: "리자드맨 대장",
+        rank: "small",
+        hp_max: 6000,
+        atk: 150,
+        def: 50,
+        req_stamina: 5,
+        time_limit: 3600,
+        rew_exp: 600,
+        rew_gold: 1000,
+        drop_card: "g_eg_c1"
+    },
+    "boss_s_04": {
+        name: "망령의 기사",
+        rank: "small",
+        hp_max: 8000,
+        atk: 180,
+        def: 100,
+        req_stamina: 6,
+        time_limit: 3600,
+        rew_exp: 800,
+        rew_gold: 1500,
+        drop_card: "g_nr_c1"
+    },
+    "boss_s_05": {
+        name: "머리 셋 달린 개", // 케르베로스 새끼
+        rank: "small",
+        hp_max: 10000,
+        atk: 250,
+        def: 80,
+        req_stamina: 8,
+        time_limit: 3600,
+        rew_exp: 1000,
+        rew_gold: 2000,
+        drop_card: "g_gr_u1"
+    },
+
+    // ============================================================
+    // [중형 보스] - Medium Bosses (본격적인 레이드)
+    // ============================================================
+    "boss_m_01": {
+        name: "키메라",
+        rank: "medium",
+        hp_max: 35000,
+        atk: 500,
+        def: 300,
+        req_stamina: 12,
+        time_limit: 7200,
+        rew_exp: 3000,
+        rew_gold: 6000,
+        drop_card: "g_gr_r1"
+    },
+    "boss_m_02": {
+        name: "사이클롭스",
+        rank: "medium",
+        hp_max: 45000,
+        atk: 800,
+        def: 200,
+        req_stamina: 15,
+        time_limit: 7200,
+        rew_exp: 4500,
+        rew_gold: 9000,
+        drop_card: "g_gr_r2"
+    },
+    "boss_m_03": {
+        name: "메두사",
+        rank: "medium",
+        hp_max: 55000,
+        atk: 600,
+        def: 600, // 석화 능력 반영
+        req_stamina: 18,
+        time_limit: 10800,
+        rew_exp: 6000,
+        rew_gold: 12000,
+        drop_card: "g_gr_e2"
+    },
+    "boss_m_04": {
+        name: "듀라한",
+        rank: "medium",
+        hp_max: 60000,
+        atk: 900,
+        def: 400,
+        req_stamina: 20,
+        time_limit: 10800,
+        rew_exp: 7500,
+        rew_gold: 15000,
+        drop_card: "g_nr_u1"
+    },
+    "boss_m_05": {
+        name: "스핑크스",
+        rank: "medium",
+        hp_max: 70000,
+        atk: 700,
+        def: 700,
+        req_stamina: 22,
+        time_limit: 14400,
+        rew_exp: 9000,
+        rew_gold: 20000,
+        drop_card: "g_eg_r1"
+    },
+
+    // ============================================================
+    // [대형 보스] - Large Bosses (월드 보스급 / 친구 필수)
+    // ============================================================
+    "boss_l_01": {
+        name: "히드라 (완전체)",
+        rank: "large",
+        hp_max: 200000,
+        atk: 2500,
+        def: 1500,
+        req_stamina: 30,
+        time_limit: 21600,
+        rew_exp: 30000,
+        rew_gold: 80000,
+        drop_card: "g_gr_e1"
+    },
+    "boss_l_02": {
+        name: "크라켄",
+        rank: "large",
+        hp_max: 500000,
+        atk: 4000,
+        def: 5000,
+        req_stamina: 40,
+        time_limit: 43200,
+        rew_exp: 80000,
+        rew_gold: 200000,
+        drop_card: "g_gr_g2" // 포세이돈 확률 드랍
+    },
+    "boss_l_03": {
+        name: "타이폰",
+        rank: "large",
+        hp_max: 1000000,
+        atk: 10000,
+        def: 8000,
+        req_stamina: 50,
+        time_limit: 86400, // 24시간
+        rew_exp: 200000,
+        rew_gold: 500000,
+        drop_card: "g_gr_g1" // 제우스 확률 드랍
+    },
+    "boss_l_04": {
+        name: "아포피스",
+        rank: "large",
+        hp_max: 1200000,
+        atk: 12000,
+        def: 6000,
+        req_stamina: 55,
+        time_limit: 86400,
+        rew_exp: 250000,
+        rew_gold: 600000,
+        drop_card: "g_eg_g1" // 라(Ra) 확률 드랍
+    },
+    "boss_l_05": {
+        name: "요르문간드",
+        rank: "large",
+        hp_max: 1500000,
+        atk: 15000,
+        def: 15000,
+        req_stamina: 60,
+        time_limit: 172800, // 48시간
+        rew_exp: 500000,
+        rew_gold: 1000000,
+        drop_card: "g_nr_l1" // 토르 확률 드랍
+    },
+
+    // ============================================================
+    // [이벤트 보스] - Event Bosses (시즌 한정 / 특수 드랍)
+    // ============================================================
+    "boss_ev_01": {
+        name: "발렌타인 초코 골렘",
+        rank: "event",
+        hp_max: 50000,
+        atk: 520,
+        def: 520,
+        req_stamina: 10,
+        time_limit: 3600,
+        rew_exp: 10000,
+        rew_gold: 10000,
+        drop_card: "item_choco", // 초콜릿 아이템 (가상)
+        desc: "사랑에 빠진 골렘입니다."
+    },
+    "boss_ev_02": {
+        name: "할로윈 잭오랜턴",
+        rank: "event",
+        hp_max: 66666,
+        atk: 666,
+        def: 666,
+        req_stamina: 6,
+        time_limit: 6666,
+        rew_exp: 6666,
+        rew_gold: 66666,
+        drop_card: "g_kr_u2", // 저승사자
+        desc: "장난을 치러 온 호박 머리."
+    },
+    "boss_ev_03": {
+        name: "산타클로스",
+        rank: "event",
+        hp_max: 122500,
+        atk: 1225,
+        def: 1225,
+        req_stamina: 1, // 이벤트 혜자
+        time_limit: 12250,
+        rew_exp: 50000,
+        rew_gold: 100000,
+        drop_card: "item_giftbox", // 선물상자
+        desc: "선물을 주러 왔다가 공격당했습니다."
+    },
+    "boss_ev_04": {
+        name: "설날 떡국 먹은 호랑이",
+        rank: "event",
+        hp_max: 202400,
+        atk: 2024,
+        def: 2024,
+        req_stamina: 20,
+        time_limit: 86400,
+        rew_exp: 100000,
+        rew_gold: 202400,
+        drop_card: "g_kr_l2", // 단군
+        desc: "나이 한 살 더 먹고 강해진 호랑이."
+    }
+};
