@@ -23,6 +23,9 @@
       } else if (v === 3) {
         save.saveVersion = 4;
         save.quests = { ...(save.quests || {}), cycles: save.quests?.cycles || {} };
+      } else if (v === 4) {
+        save.saveVersion = 5;
+        save.quests = { ...(save.quests || {}), doneCycles: save.quests?.doneCycles || {}, chapterCycle: save.quests?.chapterCycle || {} };
       }
       v = save.saveVersion;
     }
@@ -41,6 +44,8 @@
     out.quests.cycles = out.quests.cycles || {};
     out.quests.completed = out.quests.completed || {};
     out.quests.claimed = out.quests.claimed || {};
+    out.quests.doneCycles = out.quests.doneCycles || {};
+    out.quests.chapterCycle = out.quests.chapterCycle || {};
     out.units = out.units || {};
     out.inventory = out.inventory || {};
     out.buildings = out.buildings || {};

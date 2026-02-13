@@ -62,10 +62,17 @@
     p.timers.lastTick = now;
     if (dt >= 1) {
       const reg = BuffSystem.applyBuffs({ regenMul: 1 }, { player: p, deckUnits: Balance.selectedDeckUnits(p) }).regenMul || 1;
-      const rec = Math.floor((dt / 180) * reg);
-      if (rec > 0) {
-        p.stats.energy = Math.min(p.stats.energyMax, p.stats.energy + rec);
-        p.stats.stamina = Math.min(p.stats.staminaMax, p.stats.stamina + rec);
+      p.timers.energyRegenAcc = (p.timers.energyRegenAcc || 0) + (dt * reg);
+      p.timers.staminaRegenAcc = (p.timers.staminaRegenAcc || 0) + (dt * reg);
+      const energyGain = Math.floor(p.timers.energyRegenAcc / 30);
+      const staminaGain = Math.floor(p.timers.staminaRegenAcc / 45);
+      if (energyGain > 0) {
+        p.stats.energy = Math.min(p.stats.energyMax, p.stats.energy + energyGain);
+        p.timers.energyRegenAcc -= energyGain * 30;
+      }
+      if (staminaGain > 0) {
+        p.stats.stamina = Math.min(p.stats.staminaMax, p.stats.stamina + staminaGain);
+        p.timers.staminaRegenAcc -= staminaGain * 45;
       }
       const econ = Balance.calcEconomyPerMin(p);
       const addGold = (econ.net / 60) * dt;

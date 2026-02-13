@@ -1,5 +1,5 @@
 (function () {
-  const SAVE_VERSION = 4;
+  const SAVE_VERSION = 5;
   const now = () => Date.now();
   const DEFAULT_PLAYER = {
     saveVersion: SAVE_VERSION,
@@ -12,11 +12,11 @@
     inventory: { pot_hp_s: 3, mat_g_01: 3, mat_g_02: 3, w_001: 1, a_001: 1 },
     buildings: {},
     titlesUnlocked: ['초심자'],
-    quests: { progress: {}, cycles: {}, completed: {}, claimed: {} },
+    quests: { progress: {}, cycles: {}, doneCycles: {}, chapterCycle: {}, completed: {}, claimed: {} },
     bossCd: {},
     battle: { log: [], activeBossId: null, lastResult: null },
     metrics: { battlesWon: 0, battlesLost: 0, crafts: 0, goldEarnedTotal: 0, bossKills: 0 },
-    timers: { lastTick: now(), lastSave: now(), lastIncome: now(), lastEnergy: now(), lastStamina: now() },
+    timers: { lastTick: now(), lastSave: now(), lastIncome: now(), lastEnergy: now(), lastStamina: now(), energyRegenAcc: 0, staminaRegenAcc: 0 },
   };
 
   let player = JSON.parse(JSON.stringify(DEFAULT_PLAYER));

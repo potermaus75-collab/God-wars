@@ -17,6 +17,7 @@
     const bossHpMax = boss.hp_max;
     let teamHp = Math.max(1, Math.floor(power.def * 3 + player.stats.hp));
     const teamHpMax = teamHp;
+    const virtualShield = Math.max(0, Math.floor(power.def * 3));
     const logs = [];
     const turns = [];
     const effects = { boss: { burn: 0, stun: 0 }, team: { regen: 0, stun: 0 } };
@@ -97,6 +98,7 @@
       teamHp: Math.max(0, teamHp),
       bossHpMax,
       teamHpMax,
+      playerHpAfter: Math.max(0, Math.min(player.stats.hpMax || 100, Math.floor(teamHp - virtualShield))),
     };
   }
 

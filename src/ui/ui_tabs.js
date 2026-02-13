@@ -3,10 +3,34 @@
   function itemName(id) { return DataAdapter.itemMap.get(id)?.name || id || '-'; }
   function rankLabel(rank) { return ({ c: '일반', uc: '고급', r: '희귀', e: '영웅', l: '전설', g: '신화' }[rank] || '기타'); }
 
-  function portrait(kind, entity) {
-    const tone = entity.element || entity.type || 'neutral';
-    const icon = kind === 'boss' ? '👹' : (kind === 'item' ? (entity.slot === 'weapon' ? '⚔️' : entity.slot === 'armor' ? '🛡️' : '📦') : '🛡️');
-    return `<div class='portrait ${kind}' data-tone='${tone}'><span>${icon}</span></div>`;
+  function unitIcon(entity) {
+    const myth = (entity.id || '').split('_')[1];
+    const mythIcon = { gr: '🏺', kr: '🇰🇷', nr: '🪓', eg: '𓂀' }[myth] || '🛡️';
+    const rankIcon = { c: '·', uc: '✦', r: '◆', e: '✸', l: '✹', g: '☀' }[entity.rank] || '';
+    return `${mythIcon}${rankIcon}`;
+  }
+
+  function questTone(chapterId) {
+    return ({ ch1: 'fire', ch2: 'earth', ch3: 'water', ch4: 'wind' }[chapterId] || 'neutral');
+  }
+
+  function questIcon(q) {
+    if (q.type === 'boss') return '👑';
+    if (q.id.includes('ch1')) return '🏛️';
+    if (q.id.includes('ch2')) return '⛰️';
+    if (q.id.includes('ch3')) return '❄️';
+    if (q.id.includes('ch4')) return '🏜️';
+    return '📜';
+  }
+
+  function portrait(kind, entity, forcedTone) {
+    const tone = forcedTone || entity.element || entity.type || 'neutral';
+    let icon = '🛡️';
+    if (kind === 'boss') icon = entity.id?.includes('_l_') ? '🐲' : entity.id?.includes('_m_') ? '🧿' : '👹';
+    if (kind === 'item') icon = entity.slot === 'weapon' ? '⚔️' : entity.slot === 'armor' ? '🛡️' : entity.type === 'material' ? '🧪' : '🎒';
+    if (kind === 'unit') icon = unitIcon(entity);
+    if (kind === 'quest') icon = questIcon(entity);
+    return `<div class='portrait ${kind}' data-tone='${tone}' data-key='${entity.id || ''}'><span>${icon}</span></div>`;
   }
 
   function renderHome(el) {
@@ -19,10 +43,22 @@
       <div class='card-item'><div class='card-info'><div class='card-title'>튜토리얼 체크</div><div class='card-meta'>보스 1회 처치, 제작 1회, 퀘스트 마스터 완료를 달성하세요.</div></div></div>`;
   }
 
-  function classifyQuest(q) {
-    if (q.id.includes('boss')) return 'weekly';
-    if ((q.req_energy || 0) <= 10) return 'daily';
-    return 'achievement';
+  function ensureQuestState(p) {
+    p.quests.cycles = p.quests.cycles || {};
+    p.quests.progress = p.quests.progress || {};
+    p.quests.completed = p.quests.completed || {};
+    p.quests.claimed = p.quests.claimed || {};
+    p.quests.doneCycles = p.quests.doneCycles || {};
+    p.quests.chapterCycle = p.quests.chapterCycle || {};
+  }
+
+  function cycleTarget(q, cycle) {
+    const base = q.mastery_max || 100;
+    return base + ((cycle - 1) * 50);
+  }
+
+  function chapterQuestList(chapter) {
+    return chapter.list.filter((q) => !!q.id);
   }
 
   function ensureQuestState(p) {
@@ -36,54 +72,75 @@
 
   function renderQuest(el, modal, toast) {
     const p = GameState.get();
-    const quests = DataAdapter.getQuestList();
     ensureQuestState(p);
-    el.innerHTML = `<h2 class='section-title'>퀘스트</h2><div class='card-item'><div class='card-info'>각 퀘스트는 1~3사이클(마스터)까지 완료해야 최종 클리어됩니다.</div></div>`;
-    ['daily', 'weekly', 'achievement'].forEach((type) => {
-      el.innerHTML += `<div style='margin:8px 0;color:gold'>${type.toUpperCase()}</div>`;
-      quests.filter((q) => classifyQuest(q) === type).slice(0, 8).forEach((q) => {
-        const cycle = p.quests.cycles[q.id] || 1;
-        const target = cycleTarget(cycle);
-        const prog = p.quests.progress[q.id] || 0;
-        const masterDone = !!p.quests.completed[q.id];
-        const cycleDone = prog >= target;
-        const stateText = masterDone ? '마스터 완료' : `${cycle}/3 사이클 (${prog}/${target}%)`;
-        const btnText = masterDone ? (p.quests.claimed[q.id] ? '수령완료' : '보상수령') : (cycleDone ? '사이클 완료' : '진행');
-        el.innerHTML += `<div class='card-item'><div class='card-info'><div class='card-title'>${q.name}</div><div class='card-meta'>${stateText}</div></div>
-          <div class='card-action'><button class='btn-action ${masterDone || cycleDone ? 'primary' : ''}' data-q='${q.id}'>${btnText}</button></div></div>`;
+    el.innerHTML = `<h2 class='section-title'>퀘스트</h2><div class='card-item'><div class='card-info'>지역별로 1사이클 전체 완료 시 2사이클, 2사이클 전체 완료 시 3사이클(마스터)이 열립니다.</div></div>`;
+
+    Object.entries(QUESTS).forEach(([chapterId, chapter]) => {
+      const chCycle = p.quests.chapterCycle[chapterId] || 1;
+      el.innerHTML += `<div class='card-item chapter-banner'>${portrait('quest', { id: chapterId }, questTone(chapterId))}<div class='card-info'><div class='card-title'>${chapter.name}</div><div class='card-meta'>현재 지역 사이클: ${chCycle}/3</div></div></div>`;
+
+      chapterQuestList(chapter).forEach((q) => {
+        const doneCycle = p.quests.doneCycles[q.id] || 0;
+        const masterDone = doneCycle >= 3;
+        if (masterDone) p.quests.completed[q.id] = true;
+        const target = cycleTarget(q, chCycle);
+        const key = `${q.id}:c${chCycle}`;
+        const prog = Math.min(target, p.quests.progress[key] || 0);
+        const doneThisCycle = doneCycle >= chCycle;
+
+        const stateText = masterDone
+          ? '마스터 완료'
+          : doneThisCycle
+            ? `${chCycle}/3 사이클 완료 (다른 임무 대기)`
+            : `${chCycle}/3 사이클 (${prog}/${target}%)`;
+        const btnText = masterDone
+          ? (p.quests.claimed[q.id] ? '수령완료' : '보상수령')
+          : (doneThisCycle ? '대기' : '진행');
+
+        el.innerHTML += `<div class='card-item'>${portrait('quest', q, questTone(chapterId))}<div class='card-info'><div class='card-title'>${q.name}</div><div class='card-meta'>${stateText}</div></div>
+          <div class='card-action'><button class='btn-action ${(masterDone || doneThisCycle) ? 'primary' : ''}' data-q='${q.id}' data-ch='${chapterId}'>${btnText}</button></div></div>`;
       });
     });
 
     el.querySelectorAll('[data-q]').forEach((btn) => btn.onclick = () => {
+      const p2 = GameState.get();
       const id = btn.dataset.q;
-      const q = quests.find((x) => x.id === id);
-      const cycle = p.quests.cycles[id] || 1;
-      const target = cycleTarget(cycle);
-      if (p.quests.completed[id] && !p.quests.claimed[id]) {
-        p.quests.claimed[id] = true;
-        p.resources.gold += q.rew_gold_max || 100;
+      const chapterId = btn.dataset.ch;
+      const chapter = QUESTS[chapterId];
+      const q = chapter.list.find((x) => x.id === id);
+      const chCycle = p2.quests.chapterCycle[chapterId] || 1;
+      const doneCycle = p2.quests.doneCycles[id] || 0;
+
+      if (doneCycle >= 3 && !p2.quests.claimed[id]) {
+        p2.quests.claimed[id] = true;
+        p2.resources.gold += q.rew_gold_max || 100;
         GameUI.gainExp((q.rew_exp || 10) * 2);
-        toast('마스터 퀘스트 보상 수령'); SaveSystem.saveNow(); renderQuest(el, modal, toast); return;
+        toast('마스터 퀘스트 보상 수령'); SaveSystem.saveNow(); renderQuest(el, modal, toast); GameUI.updateHeader(); return;
       }
-      if (p.quests.completed[id]) return;
-      if (p.stats.energy < (q.req_energy || 1)) return toast('에너지 부족');
+      if (doneCycle >= 3) return;
+      if (doneCycle >= chCycle) return toast('해당 사이클 완료. 지역 내 다른 임무를 완료하세요.');
+      if (p2.stats.energy < (q.req_energy || 1)) return toast('에너지 부족');
 
-      p.stats.energy -= q.req_energy || 1;
-      const gain = 10 + ((cycle - 1) * 5);
-      p.quests.progress[id] = (p.quests.progress[id] || 0) + gain;
-      p.resources.gold += q.rew_gold_min || 0;
+      p2.stats.energy -= q.req_energy || 1;
+      const target = cycleTarget(q, chCycle);
+      const key = `${id}:c${chCycle}`;
+      const gain = 10 + ((chCycle - 1) * 5);
+      p2.quests.progress[key] = (p2.quests.progress[key] || 0) + gain;
+      p2.resources.gold += q.rew_gold_min || 0;
       GameUI.gainExp(q.rew_exp || 1);
-      if (Math.random() < (q.drop_rate || 0)) GameState.gainItem(q.drop_item_id, 1);
+      if (q.drop_item_id && Math.random() < (q.drop_rate || 0)) GameState.gainItem(q.drop_item_id, 1);
 
-      if (p.quests.progress[id] >= target) {
-        if (cycle >= 3) {
-          p.quests.completed[id] = true;
-          p.quests.progress[id] = target;
-          toast(`${q.name} 마스터 사이클 완료!`);
-        } else {
-          p.quests.cycles[id] = cycle + 1;
-          p.quests.progress[id] = 0;
-          toast(`${q.name} ${cycle}사이클 완료! 난이도 상승`);
+      if (p2.quests.progress[key] >= target) {
+        p2.quests.doneCycles[id] = Math.max(doneCycle, chCycle);
+        p2.quests.progress[key] = target;
+        toast(`${q.name} ${chCycle}사이클 완료!`);
+
+        const allDoneInCycle = chapterQuestList(chapter).every((qq) => (p2.quests.doneCycles[qq.id] || 0) >= chCycle);
+        if (allDoneInCycle && chCycle < 3) {
+          p2.quests.chapterCycle[chapterId] = chCycle + 1;
+          toast(`${chapter.name} ${chCycle}사이클 전체 완료! ${chCycle + 1}사이클 오픈`);
+        } else if (allDoneInCycle && chCycle === 3) {
+          toast(`${chapter.name} 마스터 사이클 완료!`);
         }
       } else toast(`${q.name} 진행 +${gain}%`);
 
@@ -140,7 +197,7 @@
     el.innerHTML = `<h2 class='section-title'>보스 전투</h2><div class='card-item'><div class='card-info'><div class='card-title'>현재 덱</div><div class='card-meta'>${deckNames || '없음'} | 전투력 ${deck.atk + deck.def}</div></div></div>`;
     availableBosses().forEach(([id, b]) => {
       const cd = (p.bossCd[id] || 0) - Date.now();
-      el.innerHTML += `<div class='card-item'>${portrait('boss', b)}<div class='card-info'><div class='card-title'>${b.name}</div><div class='card-meta'>STM ${b.req_stamina} | 제한 ${Math.floor(b.time_limit / 60)}분 | CD <span id='cd-${id}'>${cd > 0 ? Math.ceil(cd / 1000) : 0}</span></div></div><div class='card-action'><button class='btn-action primary' data-boss='${id}'>입장</button></div></div>`;
+      el.innerHTML += `<div class='card-item'>${portrait('boss', { ...b, id })}<div class='card-info'><div class='card-title'>${b.name}</div><div class='card-meta'>STM ${b.req_stamina} | 제한 ${Math.floor(b.time_limit / 60)}분 | CD <span id='cd-${id}'>${cd > 0 ? Math.ceil(cd / 1000) : 0}</span></div></div><div class='card-action'><button class='btn-action primary' data-boss='${id}'>입장</button></div></div>`;
     });
     el.querySelectorAll('[data-boss]').forEach((btn) => btn.onclick = () => {
       const id = btn.dataset.boss;
@@ -150,6 +207,7 @@
       p.stats.stamina -= boss.req_stamina;
       const result = CombatEngine.simulateBossBattle(p, id);
       p.battle.log = result.logs || [];
+      p.stats.hp = result.playerHpAfter;
       if (result.win) {
         GameUI.gainExp(result.rewards.exp);
         p.resources.gold += result.rewards.gold;
