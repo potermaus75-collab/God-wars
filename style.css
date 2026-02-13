@@ -594,3 +594,23 @@ body {
     color: #fff;
     text-shadow: 0 2px 4px #000;
 }
+
+/* ===== Enhanced portraits / battle visuals ===== */
+.portrait { border: 2px solid #666; background: radial-gradient(circle at 30% 20%, #3a3a3a, #101010 70%); color: #fff; font-weight: 700; }
+.portrait span { font-size: 18px; text-shadow: 0 1px 2px #000; }
+.portrait.unit { background: linear-gradient(135deg, #2a1f1f, #231f3f); }
+.portrait.item { background: linear-gradient(135deg, #1d2d3a, #121212); }
+.portrait.boss { background: linear-gradient(135deg, #3d1111, #1a0000); box-shadow: inset 0 0 10px rgba(255,50,50,.4); }
+.portrait.building { background: linear-gradient(135deg, #2e2a1d, #171611); }
+
+.battle-stage { background:#111; border:1px solid #5a3; border-radius:8px; padding:10px; margin-bottom:10px; }
+.battle-row { display:flex; justify-content:space-between; font-size:12px; margin-top:6px; }
+.battle-bar { height:14px; background:#2b2b2b; border:1px solid #444; border-radius:8px; overflow:hidden; }
+.battle-bar div { height:100%; width:100%; background:linear-gradient(90deg,#3ddc84,#1a8f50); transition:width .25s linear; }
+.battle-bar.boss div { background:linear-gradient(90deg,#ff7b7b,#b71c1c); }
+.battle-log-box { margin-top:8px; min-height:66px; background:#0b0b0b; border:1px solid #333; border-radius:6px; padding:8px; font-size:11px; line-height:1.4; }
+
+.roulette-wrap { text-align:center; }
+.roulette-window { height:72px; overflow:hidden; border:1px solid #555; border-radius:6px; background:#111; }
+#roulette-track { transition:transform .06s linear; }
+.roulette-item { height:24px; line-height:24px; border-bottom:1px solid #222; }
