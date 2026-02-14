@@ -1,5 +1,5 @@
 (function () {
-  const SAVE_VERSION = 6;
+  const SAVE_VERSION = 7;
   const now = () => Date.now();
   const DEFAULT_PLAYER = {
     saveVersion: SAVE_VERSION,
@@ -17,6 +17,7 @@
     battle: { log: [], activeBossId: null, lastResult: null },
     metrics: { battlesWon: 0, battlesLost: 0, crafts: 0, goldEarnedTotal: 0, bossKills: 0 },
     timers: { lastTick: now(), lastSave: now(), lastIncome: now(), lastEnergy: now(), lastStamina: now(), energyRegenAcc: 0, staminaRegenAcc: 0 },
+    systemsMeta: { missionProgressModel: 'v2-completedCount' },
   };
 
   let player = JSON.parse(JSON.stringify(DEFAULT_PLAYER));

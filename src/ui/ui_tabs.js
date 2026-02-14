@@ -2,6 +2,7 @@
   function unitName(id) { return DataAdapter.godMap.get(id)?.name || id; }
   function itemName(id) { return DataAdapter.itemMap.get(id)?.name || id || '-'; }
   function rankLabel(rank) { return ({ c: '일반', uc: '고급', r: '희귀', e: '영웅', l: '전설', g: '신화' }[rank] || '기타'); }
+  function itemRankCode(item) { return ({ common: 'c', uncommon: 'uc', rare: 'r', epic: 'e', legend: 'l', god: 'g' }[item?.rarity] || 'c'); }
 
   function unitIcon(entity) {
     const myth = (entity.id || '').split('_')[1];
@@ -30,7 +31,8 @@
     if (kind === 'item') icon = entity.slot === 'weapon' ? '⚔️' : entity.slot === 'armor' ? '🛡️' : entity.type === 'material' ? '🧪' : '🎒';
     if (kind === 'unit') icon = unitIcon(entity);
     if (kind === 'quest') icon = questIcon(entity);
-    return `<div class='portrait ${kind}' data-tone='${tone}' data-key='${entity.id || ''}'><span>${icon}</span></div>`;
+    const rarityClass = kind === 'unit' ? `rarity-${entity.rank || 'c'}` : kind === 'item' ? `rarity-${itemRankCode(entity)}` : '';
+    return `<div class='portrait ${kind} ${rarityClass}' data-tone='${tone}' data-key='${entity.id || ''}'><span>${icon}</span></div>`;
   }
 
   function renderHome(el) {
@@ -300,11 +302,13 @@
     el.innerHTML = `<h2 class='section-title'>인벤토리 / 제작</h2><div class='card-item'><div class='card-info'>장착 무기: ${itemName(p.equipment.weapon)} / 방어구: ${itemName(p.equipment.armor)}</div></div>`;
     equips.forEach((i) => {
       const own = p.inventory[i.id] || 0;
-      el.innerHTML += `<div class='card-item'>${portrait('item', i)}<div class='card-info'><div class='card-title'>${i.name}</div><div class='card-meta'>보유 ${own}</div></div><div class='card-action'><button class='btn-action' data-eq='${i.id}'>장착</button><button class='btn-action' data-uneq='${i.slot}'>해제</button></div></div>`;
+      const rk = itemRankCode(i);
+      el.innerHTML += `<div class='card-item rarity-${rk}'>${portrait('item', i)}<div class='card-info'><div class='card-title'>${i.name}</div><div class='card-meta'><span class='rank-badge'>${rk.toUpperCase()}</span> 보유 ${own}</div></div><div class='card-action'><button class='btn-action' data-eq='${i.id}'>장착</button><button class='btn-action' data-uneq='${i.slot}'>해제</button></div></div>`;
     });
     Object.entries(p.inventory).forEach(([id, c]) => {
       const i = DataAdapter.itemMap.get(id); if (!i || i.type === 'equip') return;
-      el.innerHTML += `<div class='card-item'>${portrait('item', i)}<div class='card-info'><div class='card-title'>${i.name}</div><div class='card-meta'>x${c}</div></div><div class='card-action'>${i.type === 'consumable' ? `<button class='btn-action' data-use='${id}'>사용</button>` : ''}</div></div>`;
+      const rk = itemRankCode(i);
+      el.innerHTML += `<div class='card-item rarity-${rk}'>${portrait('item', i)}<div class='card-info'><div class='card-title'>${i.name}</div><div class='card-meta'><span class='rank-badge'>${rk.toUpperCase()}</span> x${c}</div></div><div class='card-action'>${i.type === 'consumable' ? `<button class='btn-action' data-use='${id}'>사용</button>` : ''}</div></div>`;
     });
 
     el.innerHTML += `<h3 class='section-title'>제작</h3>`;
@@ -397,7 +401,8 @@
       el.innerHTML += `<div class='card-item'><div class='card-info'><div class='card-title'>${b.name} Lv.${lv}</div><div class='card-meta'>수익 ${b.income}/h | ${cost}G</div></div><div class='card-action'><button class='btn-action' data-bld='${b.id}'>구매</button></div></div>`;
     });
     ITEMS.filter((i) => i.cost > 0).forEach((i) => {
-      el.innerHTML += `<div class='card-item'>${portrait('item', i)}<div class='card-info'><div class='card-title'>${i.name}</div><div class='card-meta'>${i.cost}G</div></div><div class='card-action'><button class='btn-action' data-item='${i.id}'>구매</button></div></div>`;
+      const rk = itemRankCode(i);
+      el.innerHTML += `<div class='card-item rarity-${rk}'>${portrait('item', i)}<div class='card-info'><div class='card-title'>${i.name}</div><div class='card-meta'><span class='rank-badge'>${rk.toUpperCase()}</span> ${i.cost}G</div></div><div class='card-action'><button class='btn-action' data-item='${i.id}'>구매</button></div></div>`;
     });
     document.getElementById('gacha').onclick = () => { doGacha(toast); GameUI.updateHeader(); };
     el.querySelectorAll('[data-bld]').forEach((b) => b.onclick = () => {
