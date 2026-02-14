@@ -42,6 +42,13 @@
       } else if (v === 5) {
         save.saveVersion = 6;
         save.stats = { ...(save.stats || {}), atk: save.stats?.atk || 30, def: save.stats?.def || 30 };
+      } else if (v === 6) {
+        save.saveVersion = 7;
+        save.missionState = save.missionState || {};
+        save.missionState.completedCount = save.missionState.completedCount || {};
+        save.missionState.missionProgress = save.missionState.missionProgress || {};
+        save.pvp = { lp: 1000, honor: 0, visible: true, lastHonorDate: null, opponents: [], refreshAt: 0, ...(save.pvp || {}) };
+        save.raid = { instances: {}, activeId: null, damageByRaid: {}, history: [], ...(save.raid || {}) };
       }
       v = save.saveVersion;
     }
@@ -67,6 +74,14 @@
     out.buildings = out.buildings || {};
     out.deck = Array.isArray(out.deck) ? out.deck.filter((id) => DataAdapter.godMap.has(id)) : [];
     out.timers = { ...d.timers, ...(out.timers || {}) };
+    out.systemsMeta = { ...(d.systemsMeta || {}), ...(out.systemsMeta || {}) };
+    out.missionState = out.missionState || {};
+    out.missionState.completedCount = out.missionState.completedCount || {};
+    out.missionState.missionProgress = out.missionState.missionProgress || {};
+    out.missionState.missionRuns = out.missionState.missionRuns || {};
+    out.pvp = { lp: 1000, honor: 0, visible: true, lastHonorDate: null, opponents: [], refreshAt: 0, ...(out.pvp || {}) };
+    out.raid = { instances: {}, activeId: null, damageByRaid: {}, history: [], ...(out.raid || {}) };
+    out.gods = out.gods || { mainSlot: out.deck[0] || null, dispatched: {}, subSlots: [] };
 
     ['gold', 'gem'].forEach((k) => out.resources[k] = Math.max(0, sanitizeNum(out.resources[k], d.resources[k])));
     ['hp', 'hpMax', 'energy', 'energyMax', 'stamina', 'staminaMax', 'atk', 'def'].forEach((k) => out.stats[k] = Math.max(0, sanitizeNum(out.stats[k], d.stats[k])));
